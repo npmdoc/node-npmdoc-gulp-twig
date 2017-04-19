@@ -1,0 +1,188 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="http://github.com/zimmen/gulp-twig">gulp-twig (v0.7.0)</a>
+</h1>
+<h4>Twig.js plugin for gulp.js (gulpjs.com)</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-twig">module gulp-twig</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-twig.gulp-twig">
+            function <span class="apidocSignatureSpan"></span>gulp-twig
+            <span class="apidocSignatureSpan">(options)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.gulp-twig" id="apidoc.module.gulp-twig">module gulp-twig</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-twig.gulp-twig" id="apidoc.element.gulp-twig.gulp-twig">
+        function <span class="apidocSignatureSpan"></span>gulp-twig
+        <span class="apidocSignatureSpan">(options)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">gulp-twig = function (options) {
+    'use strict';
+    if (!options) {
+        options = {};
+    }
+
+    function modifyContents(file, cb) {
+
+        var data = file.data || options.data || {};
+
+        if (file.isNull()) {
+            return cb(null, file);
+        }
+
+        if (file.isStream()) {
+            return cb(new gutil.PluginError(PLUGIN_NAME, "Streaming not supported!"));
+        }
+
+        data._file   = file;
+        if(options.changeExt == false){
+            data._target = {
+                 path: file.path,
+                 relative: file.relative
+             }
+        }else{
+            data._target = {
+                path: rext(file.path, '.html'),
+                relative: rext(file.relative, '.html')
+            }
+        }
+
+        var Twig = require('twig'),
+            twig = Twig.twig,
+            twigOpts = {
+                path: file.path,
+                async: false
+            },
+            template;
+
+        if (options.debug !== undefined) {
+            twigOpts.debug = options.debug;
+        }
+        if (options.trace !== undefined) {
+            twigOpts.trace = options.trace;
+        }
+        if (options.base !== undefined) {
+            twigOpts.base = options.base;
+        }
+        if (options.namespaces !== undefined) {
+            twigOpts.namespaces = options.namespaces;
+        }
+        if (options.cache !== true) {
+            Twig.cache(false);
+        }
+
+        if (options.functions) {
+            options.functions.forEach(function (func) {
+                Twig.extendFunction(func.name, func.func);
+            });
+        }
+
+        if (options.filters) {
+            options.filters.forEach(function (filter) {
+                Twig.extendFilter(filter.name, filter.func);
+            });
+        }
+
+        if(options.extend) {
+            Twig.extend(options.extend);
+            delete options.extend;
+        }
+
+        template = twig(twigOpts);
+
+        try {
+            file.contents = new Buffer(template.render(data));
+        }catch(e){
+            if (options.errorLogToConsole) {
+                gutil.log(PLUGIN_NAME + ' ' + e);
+                return cb();
+            }
+
+            if (typeof options.onError === 'function') {
+                options.onError(e);
+                return cb();
+            }
+            return cb(new gutil.PluginError(PLUGIN_NAME, e));
+        }
+
+        file.path = data._target.path;
+        cb(null, file);
+    }
+
+    return map(modifyContents);
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
